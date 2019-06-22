@@ -15,10 +15,14 @@
                 </template>
               </el-table-column>
             </el-table>
+            <div class="jiesuan-div">
+              <span><small>数量：</small>{{totalCount}}个</span>
+              <span><small>总额：</small>￥{{totalMoney}}元</span>
+            </div>
             <div class="div-btn">
               <el-button type="warning">挂单</el-button>
-              <el-button type="danger">删除</el-button>
-              <el-button type="success">结账</el-button>
+              <el-button type="danger" @click="clearGoodsList()">删除</el-button>
+              <el-button type="success" @click="jiesuan()">结账</el-button>
             </div>
           </el-tab-pane>
           <el-tab-pane label="挂单">
@@ -103,7 +107,9 @@ export default {
       type0Goods: [],
       type1Goods: [],
       type2Goods: [],
-      type3Goods: []
+      type3Goods: [],
+      totalCount: 0,
+      totalMoney: 0
     }
   },
   created: function () {
@@ -142,12 +148,40 @@ export default {
         let newGoods = {goodsId: goods.goodsId, goodsName: goods.goodsName, count: 1, price: goods.price}
         this.tableData.push(newGoods)
       }
+
+      this.computedTotal()
     },
     deleteGoodsList (goods) {
       if (goods.count > 1) {
         goods.count--
       } else {
         this.tableData.pop(goods)
+      }
+      this.computedTotal()
+    },
+    computedTotal () {
+      this.totalCount = 0
+      this.totalMoney = 0
+      this.tableData.forEach((item) => {
+        console.log(item.price * item.count)
+        this.totalCount += item.count
+        this.totalMoney += (item.price * item.count)
+      })
+    },
+    clearGoodsList () {
+      this.tableData = []
+      this.totalCount = 0
+      this.totalMoney = 0
+    },
+    jiesuan () {
+      if (this.totalCount > 0) {
+        this.$message({
+          type: 'success',
+          message: '结账成功'
+        })
+        this.clearGoodsList()
+      } else {
+        this.$message.error('不能结账.')
       }
     }
   }
@@ -214,5 +248,9 @@ export default {
     font-size: 16px;
     padding-left: 10px;
     padding-top:10px;
+}
+.jiesuan-div{
+  padding: 10px;
+  text-align: right;
 }
 </style>
